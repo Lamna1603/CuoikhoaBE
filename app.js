@@ -6,6 +6,7 @@ import connectDB from './src/databases/database.connection.js';
 import userRoutes from './src/routers/userRouters.js';
 import taskRoutes from './src/routers/taskRoutes.js';
 import subBoardRoutes from './src/routers/subBoardRoutes.js';
+import teamRoutes from './src/routers/teamRoutes.js';
 dotenv.config();
 
 
@@ -41,7 +42,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/subBoards', subBoardRoutes);
-
+app.use('/api/teams', teamRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

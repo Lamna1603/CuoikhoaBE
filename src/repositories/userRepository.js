@@ -70,6 +70,40 @@ const userRepository = {
      */
     getAll: async () => {
         return await User.find().select('-password');
-    }
+    },
+
+    /**
+     * Add a team to a user.
+     * @param {string} userId - The ID of the user. 
+     * @param {string} teamId - The ID of the team to add.
+     * @return {Promise<Object>} The updated user object.
+     */
+    addTeamToUser: async (userId, teamId) => {
+        const user = await User.findById(userId);
+        if (user) {
+            if (!user.teams.includes(teamId)) {
+                user.teams.push(teamId);
+                await user.save();
+            }
+            return user;
+        }
+        return null;
+    },
+
+    /**
+     * Remove a team from a user.
+     * @param {string} userId - The ID of the user.
+     * @param {string} teamId - The ID of the team to remove.
+     * @return {Promise<Object>} The updated user object.
+     */
+    removeTeamFromUser: async (userId, teamId) => {
+        const user = await User.findById(userId);
+        if (user) {
+            user.teams = user.teams.filter(team => team.toString() !== teamId.toString());
+            await user.save();
+            return user;
+        }
+        return null;
+    },
 }
 export default userRepository;

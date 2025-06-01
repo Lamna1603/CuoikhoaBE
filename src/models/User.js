@@ -18,10 +18,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       enum: ["Admin", "Member"],
     },
-    teamId: {
-      type: mongoose.Schema.Types.ObjectId,
-      default: null,
-    }, // Không bắt buộc, có thể để null nếu không có team
+    teams: [{ // <-- Thêm trường này để lưu các team mà user thuộc về
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team',
+    }], // Không bắt buộc, có thể để null nếu không có team
   },
   { timestamps: true }
 );

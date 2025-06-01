@@ -40,9 +40,10 @@ const TaskSchema = new mongoose.Schema({
     },
     teamId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "Team",
         required: true,
     },
-    subBoards: [{
+    subBoard: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubBoard",
     }],

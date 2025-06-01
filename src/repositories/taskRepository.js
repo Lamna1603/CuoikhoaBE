@@ -101,7 +101,7 @@ const taskRepository = {
       new: true,
       runValidators: true,
     });
-    return tasl
+    return task
       ? await task
           .populate("creator", "username")
           .populate("subBoard", "name background")
