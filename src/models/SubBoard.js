@@ -12,12 +12,12 @@ const SubBoardSchema = new mongoose.Schema({
         ref: "Task",
         required: true,
     },
-    backgroundColor: {
+    background: {
         type: String,
         default: null, // Màu nền mặc định
     },
 }, { timestamps: true });
 
-SubBoardSchema.index({ name: 1, team: 1 }, { unique: true });
+SubBoardSchema.index({ name: 1, taskId: 1 }, { unique: true });
 const SubBoard = mongoose.model("SubBoard", SubBoardSchema);
 export default SubBoard;

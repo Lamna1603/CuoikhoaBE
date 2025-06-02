@@ -35,11 +35,16 @@ const taskRepository = {
    * @return {Promise<{task: Array, totalDocs: number, totalPage: number, currentPage: number}>} An object containing the tasks and pagination info.
    */
   findAll: async (options = {}) => {
-    const { page = 1, limit = 10, teamId } = options;
+    const { page = 1, limit = 10, teamId, teamIds } = options;
     const skip = (page - 1) * limit;
     let query = {};
     if (teamId) {
       query.teamId = teamId;
+    }
+
+    // Thêm hỗ trợ lọc theo nhiều teamIds
+    if (teamIds && Array.isArray(teamIds) && teamIds.length > 0) {
+      query.teamId = { $in: teamIds };
     }
 
     const totalDocs = await Task.countDocuments(query);
@@ -58,6 +63,7 @@ const taskRepository = {
           select: "username",
         },
       })
+      .populate("teamId", "name")
       .sort({ createdAt: -1 });
     const totalPages = Math.ceil(totalDocs / limit);
 
@@ -87,7 +93,8 @@ const taskRepository = {
           path: "userId",
           select: "username",
         },
-      });
+      })
+      .populate("teamId", "name");
   },
 
   /**
@@ -100,16 +107,15 @@ const taskRepository = {
     const task = await Task.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
-    });
-    return task
-      ? await task
-          .populate("creator", "username")
-          .populate("subBoard", "name background")
-          .populate({
-            path: "comments",
-            populate: { path: "userId", select: "username" },
-          })
-      : null;
+    })
+      .populate("creator", "username")
+      .populate("subBoard", "name background")
+      .populate({
+        path: "comments",
+        populate: { path: "userId", select: "username" },
+      })
+      .populate("teamId", "name");
+    return task;
   },
 
   /**
@@ -133,17 +139,17 @@ const taskRepository = {
       return null; // Task not found
     }
 
-    // Check if the sub-board already exists in the task's subBoards array
-    if (!task.subBoards.includes(subBoardId)) {
-      task.subBoards.push(subBoardId);
+    // Check if the sub-board already exists in the task's subBoard array
+    if (!task.subBoard.includes(subBoardId)) {
+      task.subBoard.push(subBoardId);
       await task.save();
     }
 
-    // Add the sub-board to the task's subBoards array
+    // Add the sub-board to the task's subBoard array
 
-    return await task
+    return await Task.findById(taskId)
       .populate("creator", "username")
-      .populate("subBoards", "name background")
+      .populate("subBoard", "name background")
       .populate({
         path: "comments",
         populate: {
@@ -165,15 +171,15 @@ const taskRepository = {
       return null; // Task not found
     }
 
-    // Remove the sub-board from the task's subBoards array
-    task.subBoards = task.subBoards.filter(
+    // Remove the sub-board from the task's subBoard array
+    task.subBoard = task.subBoard.filter(
       (id) => id.toString() !== subBoardId
     );
     await task.save();
 
-    return await task
+    return await Task.findById(taskId)
       .populate("creator", "username")
-      .populate("subBoards", "name background")
+      .populate("subBoard", "name background")
       .populate({
         path: "comments",
         populate: {
@@ -199,9 +205,9 @@ const taskRepository = {
     task.comments.push(commentId);
     await task.save();
 
-    return await task
+    return await Task.findById(taskId)
       .populate("creator", "username")
-      .populate("subBoards", "name background")
+      .populate("subBoard", "name background")
       .populate({
         path: "comments",
         populate: {

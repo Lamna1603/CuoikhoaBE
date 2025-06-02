@@ -17,8 +17,23 @@ const subBoardRepository = {
    * @return {Promise<Object|null>} The found sub-board object, or null if not found.
    */
   findById: async (id) => {
-    return await SubBoard.findById(id).populate("tasksId", "title");
+    return await SubBoard.findById(id).populate("taskId", "title");
   },
+
+  /**
+     * Finds all sub-boards belonging to a specific task.
+     * @param {string} taskId - The ID of the task.
+     * @returns {Promise<Array>} An array of sub-board objects.
+     */
+    findByTaskId: async (taskId) => {
+        try {
+            const subBoards = await SubBoard.find({ taskId: taskId });
+            return subBoards;
+        } catch (error) {
+            console.error('Error in subBoardRepository.findByTaskId:', error);
+            throw error; // Re-throw the error for service layer to handle
+        }
+    },
 
   /**
    * Finds all sub-boards for a specific task.
@@ -26,7 +41,7 @@ const subBoardRepository = {
    * @return {Promise<Array>} An array of sub-board objects.
    */
   findAllByTaskId: async (taskId) => {
-    return await SubBoard.find({ tasksId: taskId });
+    return await SubBoard.find({ taskId: taskId });
   },
 
   /**
@@ -40,7 +55,7 @@ const subBoardRepository = {
       new: true,
       runValidators: true,
     });
-    return subBoard ? await subBoard.populate("tasksId", "title") : null;
+    return subBoard ? await subBoard.populate("taskId", "title") : null;
   },
 
   /**

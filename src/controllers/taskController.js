@@ -59,6 +59,9 @@ const createTask = async (req, res, next) => {
 // @route   GET /api/tasks
 // @access  Private (All authenticated users)
 const getTasks = async (req, res, next) => {
+
+     const creatorId = req.user._id;
+
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
@@ -72,7 +75,7 @@ const getTasks = async (req, res, next) => {
             });
         }
 
-        const { tasks, totalDocs, totalPages, currentPage } = await taskService.getAllTask(page, limit, teamId);
+        const { tasks, totalDocs, totalPages, currentPage } = await taskService.getAllTask(page, limit, teamId,creatorId);
 
         res.status(200).json({
             success: true,
@@ -93,8 +96,11 @@ const getTasks = async (req, res, next) => {
 // @route   GET /api/tasks/:id
 // @access  Private (All authenticated users)
 const getTaskById = async (req, res, next) => {
+
+     const creatorId = req.user._id;
+
     try {
-        const task = await taskService.getTaskById(req.params.id);
+        const task = await taskService.getTaskById(req.params.id,creatorId);
         res.status(200).json({
             success: true,
             message: 'Get task successfully',
@@ -115,6 +121,7 @@ const getTaskById = async (req, res, next) => {
 // @access  Private (Admin only)
 const updateTask = async (req, res, next) => {
     const taskId = req.params.id;
+    const creatorId = req.user._id; // Người dùng đã xác thực là người cập nhật task
     // Chỉ cho phép cập nhật các trường này
     const { title, description, dueTime, documentLink, githubRepo, teamId } = req.body;
     const updateData = { title, description, dueTime, documentLink, githubRepo, teamId };
@@ -132,7 +139,7 @@ const updateTask = async (req, res, next) => {
     }
 
     try {
-        const updatedTask = await taskService.updateTask(taskId, updateData);
+        const updatedTask = await taskService.updateTask(taskId, updateData,creatorId);
         res.status(200).json({
             success: true,
             message: 'Task updated successfully',
@@ -153,9 +160,9 @@ const updateTask = async (req, res, next) => {
 // @access  Private (Admin only)
 const deleteTask = async (req, res, next) => {
     const taskId = req.params.id;
-
+    const creatorId = req.user._id; 
     try {
-        const deletedTask = await taskService.deleteTask(taskId);
+        const deletedTask = await taskService.deleteTask(taskId,creatorId);
         res.status(200).json({
             success: true,
             message: 'Task deleted successfully',

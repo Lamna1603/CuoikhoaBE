@@ -63,7 +63,7 @@ const teamService = {
       throw new Error("Team not found.");
     }
     // Chỉ admin của team mới được xóa
-    if (team.admin.toString() !== userId.toString()) {
+    if (team.admin._id.toString() !== userId.toString()) {
       throw new Error("Not authorized to delete this team.");
     }
     await teamRepository.delete(teamId);
@@ -72,7 +72,7 @@ const teamService = {
   addMemberToTeam: async (teamId, memberId, adminId) => {
     const team = await teamRepository.findById(teamId);
     if (!team) throw new Error("Team not found.");
-    if (team.admin.toString() !== adminId.toString())
+    if (team.admin._id.toString() !== adminId.toString())
       throw new Error("Not authorized to add member to this team.");
 
     const member = await userRepository.findById(memberId);
@@ -89,11 +89,11 @@ const teamService = {
   removeMemberFromTeam: async (teamId, memberId, adminId) => {
     const team = await teamRepository.findById(teamId);
     if (!team) throw new Error("Team not found.");
-    if (team.admin.toString() !== adminId.toString())
+    if (team.admin._id.toString() !== adminId.toString())
       throw new Error("Not authorized to remove member from this team.");
 
     // Không cho phép xóa admin khỏi thành viên
-    if (team.admin.toString() === memberId.toString()) {
+    if (team.admin._id.toString() === memberId.toString()) {
       throw new Error("Cannot remove team admin from members.");
     }
 
