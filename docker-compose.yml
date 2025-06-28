@@ -1,0 +1,20 @@
+version : '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  app:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://user:password@mongo:27017/CKh?authSource=admin
