@@ -27,5 +27,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${ secrets.DOCKER_USERNAME }/baitapcuoikhoa:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/baitapcuoikhoa:latest
           
